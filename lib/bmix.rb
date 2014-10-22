@@ -9,11 +9,10 @@ module Bmix
     end
     
     def send_raw_frame(width, height, data)
-      data_str = data.pack("C*")
-      msg = "\x23\x54\x26\x66"
-      msg += "\x00#{height.chr}\x00#{width.chr}" # TODO: support >255 height/width
-      msg += "\x00\x01\x00\xFF";
-      msg += data_str
+      msg=""
+      # [ Magic String (4),  Width(2)  Height(2), More Magic(4) ]
+      [0x23,0x54,0x26,0x66, ( height >> 8) , height & 0xFF, ( width >> 8 ) , width & 0xFF, 0x00,0x01,0x00,0xFF].each{|c| msg += c.chr}
+      data.each{|c| msg+=c.chr}
       @udp.send msg, 0
     end
     
